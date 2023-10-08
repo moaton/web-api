@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	_ "github.com/lib/pq"
 	"github.com/moaton/web-api/internal/dto"
 	"github.com/moaton/web-api/internal/models"
 )

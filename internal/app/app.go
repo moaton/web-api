@@ -16,7 +16,7 @@ func Run(cfg *models.Config) {
 		log.Fatalf("postgres.NewClient err %v", err)
 	}
 	db.NewRepository(client)
-
+	log.Println("Running...")
 	// err := http.ListenAndServe(":3000", handler)
 	// if err != nil {
 	// 	log.Println("ListenAndServe err ", err)
