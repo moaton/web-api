@@ -1,15 +1,8 @@
-package revenue
+package models
 
 import "time"
 
-type CreateRevenueDTO struct {
-	Name        string `json:"name"`
-	Discription string `json:"description"`
-	Amount      int64  `json:"amount"`
-	Type        string `json:"type"`
-}
-
-type UpdateRevenueDTO struct {
+type Revenue struct {
 	ID          int64     `json:"id"`
 	Name        string    `json:"name"`
 	Discription string    `json:"description"`

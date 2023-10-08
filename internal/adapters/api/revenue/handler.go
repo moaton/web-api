@@ -5,14 +5,14 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moaton/web-api/internal/adapters/api"
-	"github.com/moaton/web-api/internal/entities/revenue"
+	"github.com/moaton/web-api/internal/services"
 )
 
 type handler struct {
-	revenueService revenue.Service
+	revenueService services.RevenueService
 }
 
-func NewHandler(service revenue.Service) api.Handler {
+func NewHandler(service services.RevenueService) api.Handler {
 	return &handler{
 		revenueService: service,
 	}

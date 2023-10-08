@@ -2,29 +2,38 @@ package revenue
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/moaton/web-api/internal/entities/revenue"
+	"github.com/moaton/web-api/internal/dto"
+	"github.com/moaton/web-api/internal/models"
 )
 
-type RevenueStorage struct {
+type storage struct {
+	db *sql.DB
 }
 
-func (r *RevenueStorage) GetRevenues(ctx context.Context, limit, offset int64) ([]revenue.Revenue, error) {
-	return []revenue.Revenue{}, nil
+func NewRevenueStorage(db *sql.DB) *storage {
+	return &storage{
+		db: db,
+	}
 }
 
-func (r *RevenueStorage) GetRevenueById(ctx context.Context, id int64) (revenue.Revenue, error) {
-	return revenue.Revenue{}, nil
+func (s *storage) GetRevenues(ctx context.Context, limit, offset int64) ([]models.Revenue, error) {
+	return []models.Revenue{}, nil
 }
 
-func (r *RevenueStorage) InsertRevenue(ctx context.Context, dto revenue.CreateRevenueDTO) error {
+func (s *storage) GetRevenueById(ctx context.Context, id int64) (models.Revenue, error) {
+	return models.Revenue{}, nil
+}
+
+func (s *storage) InsertRevenue(ctx context.Context, dto dto.CreateRevenueDTO) error {
 	return nil
 }
 
-func (r *RevenueStorage) UpdateRevenue(ctx context.Context, dto revenue.UpdateRevenueDTO) error {
+func (s *storage) UpdateRevenue(ctx context.Context, dto dto.UpdateRevenueDTO) error {
 	return nil
 }
 
-func (r *RevenueStorage) DeleteRevenue(ctx context.Context, id int64) error {
+func (s *storage) DeleteRevenue(ctx context.Context, id int64) error {
 	return nil
 }

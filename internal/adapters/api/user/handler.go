@@ -1,20 +1,20 @@
-package revenue
+package user
 
 import (
 	"net/http"
 
 	"github.com/gorilla/mux"
 	api "github.com/moaton/web-api/internal/adapters/api"
-	"github.com/moaton/web-api/internal/entities/revenue"
+	"github.com/moaton/web-api/internal/services"
 )
 
 type handler struct {
-	revenueService revenue.Service
+	userSerivce services.UserService
 }
 
-func NewHandler(service revenue.Service) api.Handler {
+func NewHandler(service services.UserService) api.Handler {
 	return &handler{
-		revenueService: service,
+		userSerivce: service,
 	}
 }
 

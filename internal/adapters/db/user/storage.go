@@ -2,25 +2,33 @@ package user
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/moaton/web-api/internal/entities/user"
+	"github.com/moaton/web-api/internal/models"
 )
 
-type UserStorage struct {
+type storage struct {
+	db *sql.DB
 }
 
-func (u *UserStorage) GetUserByEmail(ctx context.Context, email string) (user.User, error) {
-	return user.User{}, nil
+func NewUserStorage(db *sql.DB) *storage {
+	return &storage{
+		db: db,
+	}
 }
 
-func (u *UserStorage) InsertUser(ctx context.Context, user user.User) error {
+func (s *storage) GetUserByEmail(ctx context.Context, email string) (models.User, error) {
+	return models.User{}, nil
+}
+
+func (s *storage) InsertUser(ctx context.Context, user models.User) error {
 	return nil
 }
 
-func (u *UserStorage) UpdateUser(ctx context.Context, user user.User) error {
+func (s *storage) UpdateUser(ctx context.Context, user models.User) error {
 	return nil
 }
 
-func (u *UserStorage) DeleteUser(ctx context.Context, email string) error {
+func (s *storage) DeleteUser(ctx context.Context, email string) error {
 	return nil
 }
