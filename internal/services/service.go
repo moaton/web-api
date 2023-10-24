@@ -1,6 +1,6 @@
 package services
 
-import "github.com/moaton/web-api/internal/adapters/db"
+import "github.com/moaton/web-api/internal/repository"
 
 type Service struct {
 	UserService    UserService
