@@ -8,6 +8,13 @@ import (
 	"github.com/moaton/web-api/internal/models"
 )
 
+type UserStorage interface {
+	GetUserByEmail(ctx context.Context, email string) (models.User, error)
+	InsertUser(ctx context.Context, user models.User) error
+	UpdateUser(ctx context.Context, user models.User) error
+	DeleteUser(ctx context.Context, email string) error
+}
+
 type storage struct {
 	db *sql.DB
 }
@@ -23,6 +30,8 @@ func (s *storage) GetUserByEmail(ctx context.Context, email string) (models.User
 }
 
 func (s *storage) InsertUser(ctx context.Context, user models.User) error {
+	var id int64
+	_ = s.db.QueryRowContext(ctx, "INSERT INTO user(name,) VALUES ($1) RETURNING id").Scan(&id)
 	return nil
 }
 

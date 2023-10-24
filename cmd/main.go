@@ -6,9 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/kelseyhightower/envconfig"
+	"github.com/moaton/web-api/config"
 	"github.com/moaton/web-api/internal/app"
-	"github.com/moaton/web-api/internal/models"
+	"github.com/moaton/web-api/pkg/logger"
 )
 
 func init() {
@@ -16,13 +16,12 @@ func init() {
 }
 
 func main() {
-	var cfg models.Config
-	err := envconfig.Process("", &cfg)
-	if err != nil {
-		log.Fatalf("envconfig.Process err %v", err)
-	}
+	cfg := config.GetConfig()
+
+	logger.SetLogger(cfg.IsDebug)
+
 	// revenueService := usecase.NewUseCase()
-	go app.Run(&cfg)
+	go app.Run(cfg)
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)

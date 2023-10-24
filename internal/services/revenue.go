@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/moaton/web-api/internal/adapters/db"
-	"github.com/moaton/web-api/internal/dto"
 	"github.com/moaton/web-api/internal/models"
 	"golang.org/x/net/context"
 )
@@ -12,8 +11,8 @@ import (
 type RevenueService interface {
 	GetRevenues(ctx context.Context, limit, offset int64) []models.Revenue
 	GetRevenueById(ctx context.Context, id int64) models.Revenue
-	CreateRevenue(ctx context.Context, dto dto.CreateRevenueDTO) error
-	UpdateRevenue(ctx context.Context, dto dto.UpdateRevenueDTO) error
+	CreateRevenue(ctx context.Context, revenue models.Revenue) error
+	UpdateRevenue(ctx context.Context, revenue models.Revenue) error
 	DeleteRevenue(ctx context.Context, id int64) error
 }
 
@@ -21,7 +20,7 @@ type revenueService struct {
 	db *db.Repository
 }
 
-func NewRevenueService(db *db.Repository) RevenueService {
+func newRevenueService(db *db.Repository) RevenueService {
 	return &revenueService{
 		db: db,
 	}
@@ -45,16 +44,16 @@ func (s *revenueService) GetRevenueById(ctx context.Context, id int64) models.Re
 	return revenue
 }
 
-func (s *revenueService) CreateRevenue(ctx context.Context, dto dto.CreateRevenueDTO) error {
-	if err := s.db.Revenue.InsertRevenue(ctx, dto); err != nil {
+func (s *revenueService) CreateRevenue(ctx context.Context, revenue models.Revenue) error {
+	if err := s.db.Revenue.InsertRevenue(ctx, revenue); err != nil {
 		log.Println("InsertRevenue err ", err)
 		return err
 	}
 	return nil
 }
 
-func (s *revenueService) UpdateRevenue(ctx context.Context, dto dto.UpdateRevenueDTO) error {
-	if err := s.db.Revenue.UpdateRevenue(ctx, dto); err != nil {
+func (s *revenueService) UpdateRevenue(ctx context.Context, revenue models.Revenue) error {
+	if err := s.db.Revenue.UpdateRevenue(ctx, revenue); err != nil {
 		log.Println("UpdateRevenue err ", err)
 		return err
 	}
