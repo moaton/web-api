@@ -3,7 +3,7 @@ package services
 import (
 	"log"
 
-	"github.com/moaton/web-api/internal/adapters/db"
+	"github.com/moaton/web-api/internal/repository"
 	"github.com/moaton/web-api/internal/models"
 	"golang.org/x/net/context"
 )
