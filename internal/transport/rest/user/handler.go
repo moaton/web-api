@@ -2,11 +2,12 @@ package user
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/moaton/web-api/internal/models"
 	"github.com/moaton/web-api/internal/services"
+	"github.com/moaton/web-api/pkg/logger"
+	"github.com/moaton/web-api/pkg/utils"
 )
 
 type Handler interface {
@@ -34,14 +35,29 @@ func (h *handler) Auth(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+
+	type response struct {
+		ID int64 `json:"id"`
+	}
+
 	user := models.User{}
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&user)
 	if err != nil {
-		log.Println("CreateUser decoder.Decode")
+		logger.Errorf("CreateUser decoder.Decode %v", err)
+		utils.ResponseError(w, http.StatusBadRequest, err.Error())
+		return
 	}
-	h.userSerivce.CreateUser(ctx, user)
-	w.WriteHeader(http.StatusOK)
+
+	id, err := h.userSerivce.CreateUser(ctx, user)
+	if err != nil {
+		utils.ResponseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	utils.ResponseOk(w, response{
+		ID: id,
+	})
 }
 
 func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request) {

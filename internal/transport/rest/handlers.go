@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/moaton/web-api/internal/adapters/api/revenue"
-	"github.com/moaton/web-api/internal/adapters/api/user"
 	"github.com/moaton/web-api/internal/services"
+	"github.com/moaton/web-api/internal/transport/rest/revenue"
+	"github.com/moaton/web-api/internal/transport/rest/user"
 )
 
 type Handler interface {
