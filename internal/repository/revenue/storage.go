@@ -36,7 +36,7 @@ func (s *storage) GetRevenues(ctx context.Context, limit, offset int64) ([]model
 		return []models.Revenue{}, 0, err
 	}
 
-	rows, err := s.db.QueryContext(ctx, "SELECT id, title, description, amount, type, created_at, updated_at FROM revenues LIMIT $1 OFFSET $2", limit, offset)
+	rows, err := s.db.QueryContext(ctx, "SELECT id, title, description, amount, type, createdat, updatedat FROM revenues LIMIT $1 OFFSET $2", limit, offset)
 	if err != nil {
 		return []models.Revenue{}, 0, err
 	}
@@ -55,7 +55,7 @@ func (s *storage) GetRevenues(ctx context.Context, limit, offset int64) ([]model
 
 func (s *storage) GetRevenueById(ctx context.Context, id int64) (models.Revenue, error) {
 	var revenue models.Revenue
-	err := s.db.QueryRowContext(ctx, "SELECT id, title, description, amount, type, created_at, updated_at FROM revenues WHERE id = $1", id).Scan(&revenue.ID, &revenue.Title, &revenue.Description, &revenue.Amount, &revenue.Type, &revenue.CreatedAt, &revenue.UpdatedAt)
+	err := s.db.QueryRowContext(ctx, "SELECT id, title, description, amount, type, createdat, updatedat FROM revenues WHERE id = $1", id).Scan(&revenue.ID, &revenue.Title, &revenue.Description, &revenue.Amount, &revenue.Type, &revenue.CreatedAt, &revenue.UpdatedAt)
 	if err != nil {
 		logger.Errorf("GetRevenueById total err %v", err)
 		return models.Revenue{}, err
@@ -65,12 +65,12 @@ func (s *storage) GetRevenueById(ctx context.Context, id int64) (models.Revenue,
 
 func (s *storage) InsertRevenue(ctx context.Context, revenue models.Revenue) (int64, error) {
 	var id int64
-	err := s.db.QueryRowContext(ctx, "INSERT INTO revenues (title, description, amount, type, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id", revenue.Title, revenue.Description, revenue.Amount, revenue.Type, time.Now().UTC(), time.Now().UTC()).Scan(&id)
+	err := s.db.QueryRowContext(ctx, "INSERT INTO revenues (title, description, amount, type, createdat, updatedat) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id", revenue.Title, revenue.Description, revenue.Amount, revenue.Type, time.Now().UTC(), time.Now().UTC()).Scan(&id)
 	return id, err
 }
 
 func (s *storage) UpdateRevenue(ctx context.Context, revenue models.Revenue) error {
-	_, err := s.db.QueryContext(ctx, "UPDATE revenues SET title = $1, description = $2, amount = $3, type = $4, updated_at = $5 WHERE id = $6", revenue.Title, revenue.Description, revenue.Amount, revenue.Type, time.Now().UTC(), revenue.ID)
+	_, err := s.db.QueryContext(ctx, "UPDATE revenues SET title = $1, description = $2, amount = $3, type = $4, updatedat = $5 WHERE id = $6", revenue.Title, revenue.Description, revenue.Amount, revenue.Type, time.Now().UTC(), revenue.ID)
 	return err
 }
 

@@ -34,7 +34,7 @@ func ListenAndServe(service *services.Service) {
 
 	router.HandleFunc("/revenue", handler.revenueHandler.GetRevenues).Methods("GET")
 	router.HandleFunc("/revenue/{id}", handler.revenueHandler.GetRevenueById).Methods("GET")
-	router.HandleFunc("/revenue/{id}", handler.revenueHandler.CreateRevenue).Methods("POST")
+	router.HandleFunc("/revenue", handler.revenueHandler.CreateRevenue).Methods("POST")
 	router.HandleFunc("/revenue/{id}", handler.revenueHandler.UpdateRevenue).Methods("PUT")
 	router.HandleFunc("/revenue/{id}", handler.revenueHandler.DeleteRevenue).Methods("DELETE")
 

@@ -13,6 +13,7 @@ CREATE TABLE revenues (
 	title 				VARCHAR(255),
 	description 	TEXT,
 	type 					VARCHAR(100),
+	amount 				INTEGER,
 	createdAt 		TIMESTAMP,
 	updatedAt 		TIMESTAMP
 );

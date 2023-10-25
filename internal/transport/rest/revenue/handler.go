@@ -44,7 +44,9 @@ func (h *handler) GetRevenues(w http.ResponseWriter, r *http.Request) {
 		utils.ResponseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
+	if request.Limit == 0 {
+		request.Limit = 10
+	}
 	type response struct {
 		Revenues []models.Revenue `json:"revenues"`
 		Total    int64            `json:"total"`
