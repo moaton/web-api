@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/moaton/web-api/internal/models"
 	db "github.com/moaton/web-api/internal/repository"
@@ -29,11 +30,11 @@ func newUserService(db *db.Repository) UserService {
 func (s *userService) GetUserByEmail(ctx context.Context, email, password string) (models.User, error) {
 	user, err := s.db.User.GetUserByEmail(ctx, email)
 	if err != nil {
-		return models.User{}, err
+		return models.User{}, errors.New("user not found")
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return models.User{}, err
+		return models.User{}, errors.New("invalid email or password")
 	}
 	return user, nil
 }

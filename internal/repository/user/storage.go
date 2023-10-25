@@ -27,13 +27,13 @@ func NewUserStorage(db *sql.DB) *storage {
 
 func (s *storage) GetUserByEmail(ctx context.Context, email string) (models.User, error) {
 	user := models.User{}
-	err := s.db.QueryRowContext(ctx, "SELECT email, name, passwrod FROM users WHERE email = $1", email).Scan(user.Email, user.Name, user.Password)
+	err := s.db.QueryRowContext(ctx, "SELECT email, name, password FROM users WHERE email = $1", email).Scan(&user.Email, &user.Name, &user.Password)
 	return user, err
 }
 
 func (s *storage) InsertUser(ctx context.Context, user models.User) (int64, error) {
 	var id int64
-	err := s.db.QueryRowContext(ctx, "INSERT INTO users (email, name, password) VALUES ($1, %2, %3) RETURNING id", user.Email, user.Name, user.Password).Scan(&id)
+	err := s.db.QueryRowContext(ctx, "INSERT INTO users (email, name, password) VALUES ($1, $2, $3) RETURNING id", user.Email, user.Name, user.Password).Scan(&id)
 	return id, err
 }
 

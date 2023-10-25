@@ -28,7 +28,7 @@ func ListenAndServe(service *services.Service) {
 	}
 
 	router.HandleFunc("/user/auth", handler.userHandler.Auth).Methods("POST")
-	router.HandleFunc("/user/", handler.userHandler.CreateUser).Methods("POST")
+	router.HandleFunc("/user", handler.userHandler.CreateUser).Methods("POST")
 	router.HandleFunc("/user/{id}", handler.userHandler.UpdateUser).Methods("PUT")
 	router.HandleFunc("/user/{id}", handler.userHandler.DeleteUser).Methods("DELETE")
 
@@ -38,7 +38,7 @@ func ListenAndServe(service *services.Service) {
 	router.HandleFunc("/revenue/{id}", handler.revenueHandler.UpdateRevenue).Methods("PUT")
 	router.HandleFunc("/revenue/{id}", handler.revenueHandler.DeleteRevenue).Methods("DELETE")
 
-	if err := http.ListenAndServe(":3000", router); err != nil {
+	if err := http.ListenAndServe(":3030", router); err != nil {
 		log.Println("ListenAndServe err ", err)
 	}
 }
