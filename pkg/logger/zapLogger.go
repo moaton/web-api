@@ -16,7 +16,7 @@ func NewZapLogger(space string) *ZapLogger {
 
 	config = zap.NewDevelopmentConfig()
 	config.DisableStacktrace = true
-	config.EncoderConfig.ConsoleSeparator = "		|		"
+	config.EncoderConfig.ConsoleSeparator = "  |  "
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	config.EncoderConfig.EncodeCaller = func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
 		encoder.AppendString(filepath.Base(caller.FullPath()))
