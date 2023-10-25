@@ -1,17 +1,15 @@
 package services
 
 import (
-	"log"
-
-	"github.com/moaton/web-api/internal/repository"
 	"github.com/moaton/web-api/internal/models"
+	db "github.com/moaton/web-api/internal/repository"
 	"golang.org/x/net/context"
 )
 
 type RevenueService interface {
-	GetRevenues(ctx context.Context, limit, offset int64) []models.Revenue
-	GetRevenueById(ctx context.Context, id int64) models.Revenue
-	CreateRevenue(ctx context.Context, revenue models.Revenue) error
+	GetRevenues(ctx context.Context, limit, offset int64) ([]models.Revenue, int64, error)
+	GetRevenueById(ctx context.Context, id int64) (models.Revenue, error)
+	CreateRevenue(ctx context.Context, revenue models.Revenue) (int64, error)
 	UpdateRevenue(ctx context.Context, revenue models.Revenue) error
 	DeleteRevenue(ctx context.Context, id int64) error
 }
@@ -26,44 +24,30 @@ func newRevenueService(db *db.Repository) RevenueService {
 	}
 }
 
-func (s *revenueService) GetRevenues(ctx context.Context, limit, offset int64) []models.Revenue {
-	revenues, err := s.db.Revenue.GetRevenues(ctx, limit, offset)
+func (s *revenueService) GetRevenues(ctx context.Context, limit, offset int64) ([]models.Revenue, int64, error) {
+	revenues, total, err := s.db.Revenue.GetRevenues(ctx, limit, offset)
 	if err != nil {
-		log.Println("GetRevenues err ", err)
-		return []models.Revenue{}
+		return []models.Revenue{}, 0, err
 	}
-	return revenues
+	return revenues, total, nil
 }
 
-func (s *revenueService) GetRevenueById(ctx context.Context, id int64) models.Revenue {
+func (s *revenueService) GetRevenueById(ctx context.Context, id int64) (models.Revenue, error) {
 	revenue, err := s.db.Revenue.GetRevenueById(ctx, id)
-	if err != nil {
-		log.Println("GetRevenueById err ", err)
-		return models.Revenue{}
-	}
-	return revenue
+	return revenue, err
 }
 
-func (s *revenueService) CreateRevenue(ctx context.Context, revenue models.Revenue) error {
-	if err := s.db.Revenue.InsertRevenue(ctx, revenue); err != nil {
-		log.Println("InsertRevenue err ", err)
-		return err
-	}
-	return nil
+func (s *revenueService) CreateRevenue(ctx context.Context, revenue models.Revenue) (int64, error) {
+	id, err := s.db.Revenue.InsertRevenue(ctx, revenue)
+	return id, err
 }
 
 func (s *revenueService) UpdateRevenue(ctx context.Context, revenue models.Revenue) error {
-	if err := s.db.Revenue.UpdateRevenue(ctx, revenue); err != nil {
-		log.Println("UpdateRevenue err ", err)
-		return err
-	}
-	return nil
+	err := s.db.Revenue.UpdateRevenue(ctx, revenue)
+	return err
 }
 
 func (s *revenueService) DeleteRevenue(ctx context.Context, id int64) error {
-	if err := s.db.Revenue.DeleteRevenue(ctx, id); err != nil {
-		log.Println("DeleteRevenue err ", err)
-		return err
-	}
-	return nil
+	err := s.db.Revenue.DeleteRevenue(ctx, id)
+	return err
 }
