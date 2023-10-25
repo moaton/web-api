@@ -10,7 +10,7 @@ import (
 )
 
 type UserService interface {
-	GetUserByEmail(ctx context.Context, email string) (models.User, error)
+	GetUserByEmail(ctx context.Context, email, password string) (models.User, error)
 	CreateUser(ctx context.Context, User models.User) (int64, error)
 	UpdateUser(ctx context.Context, User models.User) error
 	DeleteUser(ctx context.Context, email string) error
@@ -26,8 +26,12 @@ func newUserService(db *db.Repository) UserService {
 	}
 }
 
-func (s *userService) GetUserByEmail(ctx context.Context, email string) (models.User, error) {
+func (s *userService) GetUserByEmail(ctx context.Context, email, password string) (models.User, error) {
 	user, err := s.db.User.GetUserByEmail(ctx, email)
+	if err != nil {
+		return models.User{}, err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return models.User{}, err
 	}
@@ -50,15 +54,11 @@ func (s *userService) CreateUser(ctx context.Context, user models.User) (int64, 
 }
 
 func (s *userService) UpdateUser(ctx context.Context, user models.User) error {
-	if err := s.db.User.UpdateUser(ctx, user); err != nil {
-		return err
-	}
-	return nil
+	err := s.db.User.UpdateUser(ctx, user)
+	return err
 }
 
 func (s *userService) DeleteUser(ctx context.Context, email string) error {
-	if err := s.db.User.DeleteUser(ctx, email); err != nil {
-		return err
-	}
-	return nil
+	err := s.db.User.DeleteUser(ctx, email)
+	return err
 }
