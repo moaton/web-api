@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/moaton/web-api/internal/models"
 	"github.com/moaton/web-api/internal/services"
+	"github.com/moaton/web-api/pkg/cache"
 	"github.com/moaton/web-api/pkg/utils"
 )
 
@@ -21,11 +22,13 @@ type Handler interface {
 
 type handler struct {
 	revenueService services.RevenueService
+	cache          *cache.Cache
 }
 
-func NewHandler(revenueService services.RevenueService) Handler {
+func NewHandler(revenueService services.RevenueService, cache *cache.Cache) Handler {
 	return &handler{
 		revenueService: revenueService,
+		cache:          cache,
 	}
 }
 

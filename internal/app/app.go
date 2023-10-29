@@ -7,7 +7,8 @@ import (
 	"github.com/moaton/web-api/config"
 	db "github.com/moaton/web-api/internal/repository"
 	"github.com/moaton/web-api/internal/services"
-	adapters "github.com/moaton/web-api/internal/transport/rest"
+	"github.com/moaton/web-api/internal/transport/rest"
+	"github.com/moaton/web-api/pkg/cache"
 	"github.com/moaton/web-api/pkg/client/postgres"
 )
 
@@ -18,8 +19,10 @@ func Run(cfg *config.Config) {
 		log.Fatalf("postgres.NewClient err %v", err)
 	}
 	repo := db.NewRepository(client)
-	service := services.NewService(repo)
+	cache := cache.NewCache()
 
-	go adapters.ListenAndServe(service)
+	service := services.NewService(repo)
+	handler := rest.NewHandler(service, cache)
+	go handler.ListenAndServe()
 	log.Println("Running...")
 }

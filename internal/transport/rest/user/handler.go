@@ -6,6 +6,7 @@ import (
 
 	"github.com/moaton/web-api/internal/models"
 	"github.com/moaton/web-api/internal/services"
+	"github.com/moaton/web-api/pkg/cache"
 	"github.com/moaton/web-api/pkg/logger"
 	"github.com/moaton/web-api/pkg/utils"
 )
@@ -19,11 +20,13 @@ type Handler interface {
 
 type handler struct {
 	userSerivce services.UserService
+	cache       *cache.Cache
 }
 
-func NewHandler(userSerivce services.UserService) Handler {
+func NewHandler(userSerivce services.UserService, cache *cache.Cache) Handler {
 	return &handler{
 		userSerivce: userSerivce,
+		cache:       cache,
 	}
 }
 

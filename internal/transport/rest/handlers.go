@@ -1,4 +1,4 @@
-package adapters
+package rest
 
 import (
 	"log"
@@ -8,10 +8,11 @@ import (
 	"github.com/moaton/web-api/internal/services"
 	"github.com/moaton/web-api/internal/transport/rest/revenue"
 	"github.com/moaton/web-api/internal/transport/rest/user"
+	"github.com/moaton/web-api/pkg/cache"
 )
 
 type Handler interface {
-	Register(router *mux.Router)
+	ListenAndServe()
 }
 
 type handler struct {
@@ -19,24 +20,26 @@ type handler struct {
 	revenueHandler revenue.Handler
 }
 
-func ListenAndServe(service *services.Service) {
+func NewHandler(service *services.Service, cache *cache.Cache) *handler {
+	return &handler{
+		userHandler:    user.NewHandler(service.UserService, cache),
+		revenueHandler: revenue.NewHandler(service.RevenueService, cache),
+	}
+}
+
+func (h *handler) ListenAndServe() {
 	router := mux.NewRouter()
 
-	handler := &handler{
-		userHandler:    user.NewHandler(service.UserService),
-		revenueHandler: revenue.NewHandler(service.RevenueService),
-	}
+	router.HandleFunc("/user/auth", h.userHandler.Auth).Methods("POST")
+	router.HandleFunc("/user", h.userHandler.CreateUser).Methods("POST")
+	router.HandleFunc("/user/{id}", h.userHandler.UpdateUser).Methods("PUT")
+	router.HandleFunc("/user/{id}", h.userHandler.DeleteUser).Methods("DELETE")
 
-	router.HandleFunc("/user/auth", handler.userHandler.Auth).Methods("POST")
-	router.HandleFunc("/user", handler.userHandler.CreateUser).Methods("POST")
-	router.HandleFunc("/user/{id}", handler.userHandler.UpdateUser).Methods("PUT")
-	router.HandleFunc("/user/{id}", handler.userHandler.DeleteUser).Methods("DELETE")
-
-	router.HandleFunc("/revenue", handler.revenueHandler.GetRevenues).Methods("GET")
-	router.HandleFunc("/revenue/{id}", handler.revenueHandler.GetRevenueById).Methods("GET")
-	router.HandleFunc("/revenue", handler.revenueHandler.CreateRevenue).Methods("POST")
-	router.HandleFunc("/revenue/{id}", handler.revenueHandler.UpdateRevenue).Methods("PUT")
-	router.HandleFunc("/revenue/{id}", handler.revenueHandler.DeleteRevenue).Methods("DELETE")
+	router.HandleFunc("/revenue", h.revenueHandler.GetRevenues).Methods("GET")
+	router.HandleFunc("/revenue/{id}", h.revenueHandler.GetRevenueById).Methods("GET")
+	router.HandleFunc("/revenue", h.revenueHandler.CreateRevenue).Methods("POST")
+	router.HandleFunc("/revenue/{id}", h.revenueHandler.UpdateRevenue).Methods("PUT")
+	router.HandleFunc("/revenue/{id}", h.revenueHandler.DeleteRevenue).Methods("DELETE")
 
 	if err := http.ListenAndServe(":3030", router); err != nil {
 		log.Println("ListenAndServe err ", err)
