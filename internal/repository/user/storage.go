@@ -27,7 +27,7 @@ func NewUserStorage(db *sql.DB) *storage {
 
 func (s *storage) GetUserByEmail(ctx context.Context, email string) (models.User, error) {
 	user := models.User{}
-	err := s.db.QueryRowContext(ctx, "SELECT email, name, password FROM users WHERE email = $1", email).Scan(&user.Email, &user.Name, &user.Password)
+	err := s.db.QueryRowContext(ctx, "SELECT id, email, name, password FROM users WHERE email = $1", email).Scan(&user.ID, &user.Email, &user.Name, &user.Password)
 	return user, err
 }
 

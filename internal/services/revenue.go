@@ -3,6 +3,7 @@ package services
 import (
 	"github.com/moaton/web-api/internal/models"
 	db "github.com/moaton/web-api/internal/repository"
+	"github.com/moaton/web-api/pkg/cache"
 	"golang.org/x/net/context"
 )
 
@@ -15,12 +16,14 @@ type RevenueService interface {
 }
 
 type revenueService struct {
-	db *db.Repository
+	db    *db.Repository
+	cache *cache.Cache
 }
 
-func newRevenueService(db *db.Repository) RevenueService {
+func newRevenueService(db *db.Repository, cache *cache.Cache) RevenueService {
 	return &revenueService{
-		db: db,
+		db:    db,
+		cache: cache,
 	}
 }
 

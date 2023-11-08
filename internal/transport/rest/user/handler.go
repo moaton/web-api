@@ -3,6 +3,7 @@ package user
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/moaton/web-api/internal/models"
 	"github.com/moaton/web-api/internal/services"
@@ -50,11 +51,15 @@ func (h *handler) Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokens, err := h.userSerivce.Refresh(ctx, request.RefreshToken)
+	id, tokens, err := h.userSerivce.Refresh(ctx, request.RefreshToken)
 	if err != nil {
 		logger.Errorf("Refresh err %v", err)
 		utils.ResponseError(w, http.StatusUnauthorized, err.Error())
 		return
+	}
+
+	if err := h.cache.Set(id, tokens["refresh_token"], time.Now().Add(time.Hour*24).Unix()); err != nil {
+		logger.Errorf("Refresh cache.Set err %v", err)
 	}
 
 	utils.ResponseOk(w, response{
@@ -71,9 +76,7 @@ func (h *handler) Auth(w http.ResponseWriter, r *http.Request) {
 		Password string `json:"password"`
 	}
 	type response struct {
-		ID    int64  `json:"id"`
-		Email string `json:"email"`
-		Name  string `json:"name"`
+		Refresh string `json:"refresh_token"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&request)
@@ -86,15 +89,26 @@ func (h *handler) Auth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.userSerivce.GetUserByEmail(ctx, request.Email, request.Password)
+	id, tokens, err := h.userSerivce.Auth(ctx, request.Email, request.Password)
 	if err != nil {
 		utils.ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	cookie := http.Cookie{
+		Name:     "Bearer",
+		Value:    tokens["access_token"],
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+	}
+	http.SetCookie(w, &cookie)
+
+	if err := h.cache.Set(id, tokens["refresh_token"], time.Now().Add(time.Hour*24).Unix()); err != nil {
+		logger.Errorf("Refresh cache.Set err %v", err)
+	}
+
 	utils.ResponseOk(w, response{
-		ID:    user.ID,
-		Email: user.Email,
-		Name:  user.Name,
+		Refresh: tokens["refresh_token"],
 	})
 }
 

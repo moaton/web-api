@@ -28,6 +28,9 @@ func (c *Cache) cleaner() {
 	for {
 		c.Lock()
 		for k, v := range c.cache {
+			if v.exp == 0 {
+				continue
+			}
 			if time.Now().Unix() > v.exp {
 				delete(c.cache, k)
 			}
@@ -37,13 +40,13 @@ func (c *Cache) cleaner() {
 	}
 }
 
-func (c *Cache) Set(key interface{}, value interface{}) error {
+func (c *Cache) Set(key interface{}, value interface{}, ttl int64) error {
 	c.Lock()
 	defer c.Unlock()
 
 	c.cache[key] = &item{
 		value: value,
-		exp:   time.Now().Unix() + 500,
+		exp:   ttl,
 	}
 
 	return nil

@@ -24,6 +24,7 @@ func Encode(id int64, email string) (map[string]string, error) {
 	refreshToken := jwt.New(jwt.SigningMethodHS256)
 	rtClaims := refreshToken.Claims.(jwt.MapClaims)
 	rtClaims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	rtClaims["email"] = email
 	rt, err := refreshToken.SignedString([]byte(secret))
 	if err != nil {
 		logger.Errorf("NewToken refreshToken err %v", err)

@@ -21,7 +21,7 @@ func Run(cfg *config.Config) {
 	repo := db.NewRepository(client)
 	cache := cache.NewCache()
 
-	service := services.NewService(repo)
+	service := services.NewService(repo, cache)
 	middleware := services.NewMiddleware()
 	handler := rest.NewHandler(service, cache, middleware)
 
