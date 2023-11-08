@@ -38,11 +38,11 @@ func (s *storage) InsertUser(ctx context.Context, user models.User) (int64, erro
 }
 
 func (s *storage) UpdateUser(ctx context.Context, user models.User) error {
-	_, err := s.db.QueryContext(ctx, "UPDATE users SET email = $1, name = $2, password = $3 WHERE id = $4", user.Email, user.Name, user.Password, user.ID)
+	_, err := s.db.ExecContext(ctx, "UPDATE users SET email = $1, name = $2, password = $3 WHERE id = $4", user.Email, user.Name, user.Password, user.ID)
 	return err
 }
 
 func (s *storage) DeleteUser(ctx context.Context, email string) error {
-	_, err := s.db.QueryContext(ctx, "DELETE FROM users WHERE email = $1", email)
+	_, err := s.db.ExecContext(ctx, "DELETE FROM users WHERE email = $1", email)
 	return err
 }

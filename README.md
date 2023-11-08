@@ -22,3 +22,16 @@
     ├───logger
     └───utils
 ```
+
+### Unit тесты
+>   Для запуска тестов:
+
+```bash
+make test
+```
+
+>   Для проверки покрытия
+```bash
+go test -v ./ -coverprofile=filename
+go tool cover -html=filename
+```
