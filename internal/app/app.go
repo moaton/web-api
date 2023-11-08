@@ -22,7 +22,9 @@ func Run(cfg *config.Config) {
 	cache := cache.NewCache()
 
 	service := services.NewService(repo)
-	handler := rest.NewHandler(service, cache)
+	middleware := services.NewMiddleware()
+	handler := rest.NewHandler(service, cache, middleware)
+
 	go handler.ListenAndServe()
 	log.Println("Running...")
 }

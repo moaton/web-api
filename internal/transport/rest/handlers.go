@@ -18,17 +18,19 @@ type Handler interface {
 type handler struct {
 	userHandler    user.Handler
 	revenueHandler revenue.Handler
+	middleware     services.MiddleWare
 }
 
-func NewHandler(service *services.Service, cache *cache.Cache) *handler {
+func NewHandler(service *services.Service, cache *cache.Cache, middleware services.MiddleWare) *handler {
 	return &handler{
-		userHandler:    user.NewHandler(service.UserService, cache),
-		revenueHandler: revenue.NewHandler(service.RevenueService, cache),
+		userHandler:    user.NewHandler(service.UserService, cache, middleware),
+		revenueHandler: revenue.NewHandler(service.RevenueService, cache, middleware),
 	}
 }
 
 func (h *handler) ListenAndServe() {
 	router := mux.NewRouter()
+	router.HandleFunc("/refresh", h.userHandler.Refresh).Methods("POST")
 
 	router.HandleFunc("/user/auth", h.userHandler.Auth).Methods("POST")
 	router.HandleFunc("/user", h.userHandler.CreateUser).Methods("POST")

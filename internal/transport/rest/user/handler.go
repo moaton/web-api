@@ -12,6 +12,7 @@ import (
 )
 
 type Handler interface {
+	Refresh(w http.ResponseWriter, r *http.Request)
 	Auth(w http.ResponseWriter, r *http.Request)
 	CreateUser(w http.ResponseWriter, r *http.Request)
 	UpdateUser(w http.ResponseWriter, r *http.Request)
@@ -21,13 +22,45 @@ type Handler interface {
 type handler struct {
 	userSerivce services.UserService
 	cache       *cache.Cache
+	middleware  services.MiddleWare
 }
 
-func NewHandler(userSerivce services.UserService, cache *cache.Cache) Handler {
+func NewHandler(userSerivce services.UserService, cache *cache.Cache, middleware services.MiddleWare) Handler {
 	return &handler{
 		userSerivce: userSerivce,
 		cache:       cache,
+		middleware:  middleware,
 	}
+}
+
+func (h *handler) Refresh(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	var request struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+	type response struct {
+		Access  string `json:"access_token"`
+		Refresh string `json:"refresh_token"`
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&request)
+	if err != nil {
+		utils.ResponseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	tokens, err := h.userSerivce.Refresh(ctx, request.RefreshToken)
+	if err != nil {
+		logger.Errorf("Refresh err %v", err)
+		utils.ResponseError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	utils.ResponseOk(w, response{
+		Access:  tokens["access_token"],
+		Refresh: tokens["refresh_token"],
+	})
 }
 
 func (h *handler) Auth(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +102,7 @@ func (h *handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	type response struct {
-		ID int64 `json:"id"`
+		Refresh string `json:"refresh_token"`
 	}
 
 	user := models.User{}
@@ -81,14 +114,22 @@ func (h *handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := h.userSerivce.CreateUser(ctx, user)
+	tokens, err := h.userSerivce.CreateUser(ctx, user)
 	if err != nil {
 		utils.ResponseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	cookie := http.Cookie{
+		Name:     "Bearer",
+		Value:    tokens["access_token"],
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+	}
+	http.SetCookie(w, &cookie)
 
 	utils.ResponseOk(w, response{
-		ID: id,
+		Refresh: tokens["refresh_token"],
 	})
 }
 
