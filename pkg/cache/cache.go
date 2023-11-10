@@ -16,7 +16,7 @@ type Cache struct {
 	sync.RWMutex
 }
 
-func NewCache() *Cache {
+func New() *Cache {
 	cache := &Cache{
 		cache: make(map[interface{}]*item),
 	}

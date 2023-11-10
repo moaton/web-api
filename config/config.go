@@ -11,6 +11,7 @@ type Config struct {
 	PostgresUser     string `envconfig:"POSTGRES_USER"`
 	PostgresPassword string `envconfig:"POSTGRES_PASSWORD"`
 	PostgresDB       string `envconfig:"POSTGRES_DB"`
+	Secret           string `envconfig:"SECRET"`
 
 	IsDebug bool `envconfig:"IS_DEBUG"`
 }

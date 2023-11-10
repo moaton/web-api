@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"net/http"
@@ -6,13 +6,13 @@ import (
 	"github.com/moaton/web-api/pkg/logger"
 )
 
-type MiddleWare interface {
+type Middleware interface {
 	GetTokenFromHeader(r *http.Request) (string, error)
 }
 
 type middleware struct{}
 
-func NewMiddleware() MiddleWare {
+func NewMiddleware() Middleware {
 	return &middleware{}
 }
 

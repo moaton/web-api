@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	"github.com/moaton/web-api/internal/models"

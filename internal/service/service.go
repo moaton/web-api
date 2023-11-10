@@ -1,4 +1,4 @@
-package services
+package service
 
 import (
 	db "github.com/moaton/web-api/internal/repository"
@@ -10,7 +10,7 @@ type Service struct {
 	RevenueService RevenueService
 }
 
-func NewService(db *db.Repository, cache *cache.Cache) *Service {
+func New(db *db.Repository, cache *cache.Cache) *Service {
 	return &Service{
 		UserService:    newUserService(db, cache),
 		RevenueService: newRevenueService(db, cache),

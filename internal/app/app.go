@@ -5,8 +5,10 @@ import (
 	"log"
 
 	"github.com/moaton/web-api/config"
+	"github.com/moaton/web-api/internal/middleware"
 	db "github.com/moaton/web-api/internal/repository"
-	"github.com/moaton/web-api/internal/services"
+	"github.com/moaton/web-api/internal/service"
+	"github.com/moaton/web-api/internal/token"
 	"github.com/moaton/web-api/internal/transport/rest"
 	"github.com/moaton/web-api/pkg/cache"
 	"github.com/moaton/web-api/pkg/client/postgres"
@@ -19,11 +21,12 @@ func Run(cfg *config.Config) {
 		log.Fatalf("postgres.NewClient err %v", err)
 	}
 	repo := db.NewRepository(client)
-	cache := cache.NewCache()
+	cache := cache.New()
 
-	service := services.NewService(repo, cache)
-	middleware := services.NewMiddleware()
-	handler := rest.NewHandler(service, cache, middleware)
+	service := service.New(repo, cache)
+	token := token.New(cfg.Secret)
+	middleware := middleware.New(cfg.Secret, token)
+	handler := rest.New(service, cache, middleware)
 
 	go handler.ListenAndServe()
 	log.Println("Running...")

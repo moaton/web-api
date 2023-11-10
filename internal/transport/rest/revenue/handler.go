@@ -7,9 +7,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/moaton/web-api/internal/models"
-	"github.com/moaton/web-api/internal/services"
+	"github.com/moaton/web-api/internal/service"
 	"github.com/moaton/web-api/pkg/cache"
-	"github.com/moaton/web-api/pkg/logger"
 	"github.com/moaton/web-api/pkg/utils"
 )
 
@@ -22,28 +21,20 @@ type Handler interface {
 }
 
 type handler struct {
-	revenueService services.RevenueService
+	revenueService service.RevenueService
 	cache          *cache.Cache
-	middleware     services.MiddleWare
 }
 
-func NewHandler(revenueService services.RevenueService, cache *cache.Cache, middleware services.MiddleWare) Handler {
+func NewHandler(revenueService service.RevenueService, cache *cache.Cache) Handler {
 	return &handler{
 		revenueService: revenueService,
 		cache:          cache,
-		middleware:     middleware,
 	}
 }
 
 func (h *handler) GetRevenues(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	email, err := h.middleware.GetTokenFromHeader(r)
-	if err != nil {
-		utils.ResponseError(w, http.StatusUnauthorized, err.Error())
-		return
-	}
-	logger.Warn("GetRevenues ", email)
 	var request struct {
 		Limit  int64  `json:"limit"`
 		Offset int64  `json:"offset"`
@@ -51,7 +42,7 @@ func (h *handler) GetRevenues(w http.ResponseWriter, r *http.Request) {
 	}
 
 	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&request)
+	err := decoder.Decode(&request)
 	if err != nil {
 		utils.ResponseError(w, http.StatusInternalServerError, err.Error())
 		return
