@@ -21,7 +21,7 @@ type storage struct {
 	db *sql.DB
 }
 
-func NewRevenueStorage(db *sql.DB) *storage {
+func NewRevenueStorage(db *sql.DB) RevenueStorage {
 	return &storage{
 		db: db,
 	}
@@ -29,7 +29,6 @@ func NewRevenueStorage(db *sql.DB) *storage {
 
 func (s *storage) GetRevenues(ctx context.Context, limit, offset int64) ([]models.Revenue, int64, error) {
 	var total int64
-
 	err := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM revenues LIMIT $1 OFFSET $2", limit, offset).Scan(&total)
 	if err != nil {
 		logger.Errorf("GetRevenues total err %v", err)
@@ -38,6 +37,7 @@ func (s *storage) GetRevenues(ctx context.Context, limit, offset int64) ([]model
 
 	rows, err := s.db.QueryContext(ctx, "SELECT id, title, description, amount, type, createdat, updatedat FROM revenues LIMIT $1 OFFSET $2", limit, offset)
 	if err != nil {
+		logger.Errorf("GetRevenues SELECT err %v", err)
 		return []models.Revenue{}, 0, err
 	}
 	revenues := []models.Revenue{}
@@ -70,11 +70,11 @@ func (s *storage) InsertRevenue(ctx context.Context, revenue models.Revenue) (in
 }
 
 func (s *storage) UpdateRevenue(ctx context.Context, revenue models.Revenue) error {
-	_, err := s.db.QueryContext(ctx, "UPDATE revenues SET title = $1, description = $2, amount = $3, type = $4, updatedat = $5 WHERE id = $6", revenue.Title, revenue.Description, revenue.Amount, revenue.Type, time.Now().UTC(), revenue.ID)
+	_, err := s.db.ExecContext(ctx, "UPDATE revenues SET title = $1, description = $2, amount = $3, type = $4, updatedat = $5 WHERE id = $6", revenue.Title, revenue.Description, revenue.Amount, revenue.Type, time.Now().UTC(), revenue.ID)
 	return err
 }
 
 func (s *storage) DeleteRevenue(ctx context.Context, id int64) error {
-	_, err := s.db.QueryContext(ctx, "DELETE FROM revenues WHERE id = $1", id)
+	_, err := s.db.ExecContext(ctx, "DELETE FROM revenues WHERE id = $1", id)
 	return err
 }

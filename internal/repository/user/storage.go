@@ -19,7 +19,7 @@ type storage struct {
 	db *sql.DB
 }
 
-func NewUserStorage(db *sql.DB) *storage {
+func NewUserStorage(db *sql.DB) UserStorage {
 	return &storage{
 		db: db,
 	}

@@ -46,7 +46,6 @@ func TestGetUserByEmail(t *testing.T) {
 
 	userEx = models.User{}
 	assert.Equal(t, userEx, user, "they should be equal")
-
 }
 
 func TestInsertUser(t *testing.T) {

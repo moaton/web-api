@@ -1,0 +1,17 @@
+mode: set
+github.com/moaton/web-api/internal/repository/revenue/storage.go:24.51,28.2 1 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:30.106,33.16 3 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:33.16,36.3 2 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:38.2,39.16 2 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:39.16,42.3 2 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:43.2,44.18 2 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:44.18,47.17 3 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:47.17,49.12 2 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:51.3,51.39 1 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:53.2,53.29 1 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:56.89,59.16 3 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:59.16,62.3 2 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:63.2,63.21 1 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:66.93,70.2 3 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:72.84,75.2 2 1
+github.com/moaton/web-api/internal/repository/revenue/storage.go:77.70,80.2 2 1
