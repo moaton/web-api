@@ -30,6 +30,12 @@
 make test
 ```
 
+>   Для проверки покрытия тестов:
+
+```bash
+make view_test
+```
+
 >   Для проверки покрытия
 ```bash
 go test -v ./ -coverprofile=filename
