@@ -6,11 +6,13 @@
 ├───config
 ├───internal
 │   ├───app
+│   ├───middleware
 │   ├───models
 │   ├───repository
 │   │   ├───revenue
 │   │   └───user
-│   ├───services
+│   ├───service
+│   ├───token
 │   └───transport
 │       └───rest
 │           ├───revenue
