@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/moaton/web-api/internal/middleware"
 	"github.com/moaton/web-api/internal/service"
+	"github.com/moaton/web-api/internal/token"
 	"github.com/moaton/web-api/internal/transport/rest/revenue"
 	"github.com/moaton/web-api/internal/transport/rest/user"
 	"github.com/moaton/web-api/pkg/cache"
@@ -19,14 +20,15 @@ type Handler interface {
 type handler struct {
 	userHandler    user.Handler
 	revenueHandler revenue.Handler
-	middleware2    middleware.Middleware
+	middleware     middleware.Middleware
+	token          token.Token
 }
 
-func New(service *service.Service, cache *cache.Cache, middleware middleware.Middleware) *handler {
+func New(service *service.Service, cache *cache.Cache, middleware middleware.Middleware, token token.Token) *handler {
 	return &handler{
-		userHandler:    user.NewHandler(service.UserService, cache),
+		userHandler:    user.NewHandler(service.UserService, cache, token),
 		revenueHandler: revenue.NewHandler(service.RevenueService, cache),
-		middleware2:    middleware,
+		middleware:     middleware,
 	}
 }
 
@@ -46,7 +48,7 @@ func (h *handler) ListenAndServe() {
 	router.HandleFunc("/revenue/{id}", h.revenueHandler.UpdateRevenue).Methods("PUT")
 	router.HandleFunc("/revenue/{id}", h.revenueHandler.DeleteRevenue).Methods("DELETE")
 
-	router.Use(h.middleware2.AuthMiddleware)
+	router.Use(h.middleware.AuthMiddleware)
 
 	if err := http.ListenAndServe(":3030", router); err != nil {
 		log.Println("ListenAndServe err ", err)

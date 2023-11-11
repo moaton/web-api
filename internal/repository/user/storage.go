@@ -9,6 +9,7 @@ import (
 )
 
 type UserStorage interface {
+	GetUserById(ctx context.Context, id int64) (models.User, error)
 	GetUserByEmail(ctx context.Context, email string) (models.User, error)
 	InsertUser(ctx context.Context, user models.User) (int64, error)
 	UpdateUser(ctx context.Context, user models.User) error
@@ -23,6 +24,12 @@ func NewUserStorage(db *sql.DB) UserStorage {
 	return &storage{
 		db: db,
 	}
+}
+
+func (s *storage) GetUserById(ctx context.Context, id int64) (models.User, error) {
+	user := models.User{}
+	err := s.db.QueryRowContext(ctx, "SELECT id, email, name, password FROM users WHERE id = $1", id).Scan(&user.ID, &user.Email, &user.Name, &user.Password)
+	return user, err
 }
 
 func (s *storage) GetUserByEmail(ctx context.Context, email string) (models.User, error) {

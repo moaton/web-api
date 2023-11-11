@@ -11,6 +11,43 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestGetUserById(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	storage := user.NewUserStorage(db)
+
+	//	Case: Когда юзер есть
+
+	rows := sqlmock.NewRows([]string{"id", "email", "name", "password"}).AddRow(5, "test", "test", "123")
+
+	mock.ExpectQuery("^SELECT id, email, name, password FROM users*").WithArgs(5).WillReturnRows(rows)
+
+	user, err := storage.GetUserById(context.Background(), 5)
+	require.NoError(t, err)
+
+	userEx := models.User{
+		ID:       5,
+		Email:    "test",
+		Name:     "test",
+		Password: "123",
+	}
+	assert.Equal(t, userEx, user, "they should be equal")
+
+	//	Case: Когда юзера нет
+
+	rows = sqlmock.NewRows([]string{"id", "email", "name", "password"}).AddRow(0, "", "", "")
+
+	mock.ExpectQuery("^SELECT id, email, name, password FROM users*").WithArgs(5).WillReturnRows(rows)
+
+	user, err = storage.GetUserById(context.Background(), 5)
+	require.NoError(t, err)
+
+	userEx = models.User{}
+	assert.Equal(t, userEx, user, "they should be equal")
+}
+
 func TestGetUserByEmail(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {

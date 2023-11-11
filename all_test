@@ -15,8 +15,9 @@ github.com/moaton/web-api/internal/repository/revenue/storage.go:63.2,63.21 1 1
 github.com/moaton/web-api/internal/repository/revenue/storage.go:66.93,70.2 3 1
 github.com/moaton/web-api/internal/repository/revenue/storage.go:72.84,75.2 2 1
 github.com/moaton/web-api/internal/repository/revenue/storage.go:77.70,80.2 2 1
-github.com/moaton/web-api/internal/repository/user/storage.go:22.45,26.2 1 1
-github.com/moaton/web-api/internal/repository/user/storage.go:28.90,32.2 3 1
-github.com/moaton/web-api/internal/repository/user/storage.go:34.84,38.2 3 1
-github.com/moaton/web-api/internal/repository/user/storage.go:40.75,43.2 2 1
-github.com/moaton/web-api/internal/repository/user/storage.go:45.71,48.2 2 1
+github.com/moaton/web-api/internal/repository/user/storage.go:23.45,27.2 1 1
+github.com/moaton/web-api/internal/repository/user/storage.go:29.83,33.2 3 1
+github.com/moaton/web-api/internal/repository/user/storage.go:35.90,39.2 3 1
+github.com/moaton/web-api/internal/repository/user/storage.go:41.84,45.2 3 1
+github.com/moaton/web-api/internal/repository/user/storage.go:47.75,50.2 2 1
+github.com/moaton/web-api/internal/repository/user/storage.go:52.71,55.2 2 1

@@ -7,6 +7,7 @@ import (
 
 	"github.com/moaton/web-api/internal/models"
 	"github.com/moaton/web-api/internal/service"
+	"github.com/moaton/web-api/internal/token"
 	"github.com/moaton/web-api/pkg/cache"
 	"github.com/moaton/web-api/pkg/logger"
 	"github.com/moaton/web-api/pkg/utils"
@@ -23,12 +24,14 @@ type Handler interface {
 type handler struct {
 	userSerivce service.UserService
 	cache       *cache.Cache
+	token       token.Token
 }
 
-func NewHandler(userSerivce service.UserService, cache *cache.Cache) Handler {
+func NewHandler(userSerivce service.UserService, cache *cache.Cache, token token.Token) Handler {
 	return &handler{
 		userSerivce: userSerivce,
 		cache:       cache,
+		token:       token,
 	}
 }
 
@@ -38,8 +41,8 @@ func (h *handler) Refresh(w http.ResponseWriter, r *http.Request) {
 		RefreshToken string `json:"refresh_token"`
 	}
 	type response struct {
-		Access  string `json:"access_token"`
-		Refresh string `json:"refresh_token"`
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -49,20 +52,37 @@ func (h *handler) Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, tokens, err := h.userSerivce.Refresh(ctx, request.RefreshToken)
+	id, err := h.token.ExtractIDFromToken(request.RefreshToken)
 	if err != nil {
-		logger.Errorf("Refresh err %v", err)
 		utils.ResponseError(w, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	if err := h.cache.Set(id, tokens["refresh_token"], time.Now().Add(time.Hour*24).Unix()); err != nil {
+	user, err := h.userSerivce.GetUserById(ctx, id)
+	if err != nil {
+		utils.ResponseError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	accessToken, err := h.token.CreateAccessToken(user.ID, user.Email)
+	if err != nil {
+		utils.ResponseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	refreshToken, err := h.token.CreateRefreshToken(user.ID)
+	if err != nil {
+		utils.ResponseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := h.cache.Set(user.ID, refreshToken, time.Now().Add(time.Hour*24).Unix()); err != nil {
 		logger.Errorf("Refresh cache.Set err %v", err)
 	}
 
 	utils.ResponseOk(w, response{
-		Access:  tokens["access_token"],
-		Refresh: tokens["refresh_token"],
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	})
 }
 
@@ -74,7 +94,8 @@ func (h *handler) Auth(w http.ResponseWriter, r *http.Request) {
 		Password string `json:"password"`
 	}
 	type response struct {
-		Refresh string `json:"refresh_token"`
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
 	}
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&request)
@@ -87,26 +108,31 @@ func (h *handler) Auth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, tokens, err := h.userSerivce.Auth(ctx, request.Email, request.Password)
+	user, err := h.userSerivce.Auth(ctx, request.Email, request.Password)
 	if err != nil {
 		utils.ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	cookie := http.Cookie{
-		Name:     "Bearer",
-		Value:    tokens["access_token"],
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   true,
-	}
-	http.SetCookie(w, &cookie)
 
-	if err := h.cache.Set(id, tokens["refresh_token"], time.Now().Add(time.Hour*24).Unix()); err != nil {
+	accessToken, err := h.token.CreateAccessToken(user.ID, user.Email)
+	if err != nil {
+		utils.ResponseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	refreshToken, err := h.token.CreateRefreshToken(user.ID)
+	if err != nil {
+		utils.ResponseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := h.cache.Set(user.ID, refreshToken, time.Now().Add(time.Hour*24*7).Unix()); err != nil {
 		logger.Errorf("Refresh cache.Set err %v", err)
 	}
 
 	utils.ResponseOk(w, response{
-		Refresh: tokens["refresh_token"],
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	})
 }
 
@@ -114,7 +140,8 @@ func (h *handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	type response struct {
-		Refresh string `json:"refresh_token"`
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
 	}
 
 	user := models.User{}
@@ -126,22 +153,27 @@ func (h *handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokens, err := h.userSerivce.CreateUser(ctx, user)
+	user, err = h.userSerivce.CreateUser(ctx, user)
 	if err != nil {
 		utils.ResponseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	cookie := http.Cookie{
-		Name:     "Bearer",
-		Value:    tokens["access_token"],
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   true,
+
+	accessToken, err := h.token.CreateAccessToken(user.ID, user.Email)
+	if err != nil {
+		utils.ResponseError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
-	http.SetCookie(w, &cookie)
+
+	refreshToken, err := h.token.CreateRefreshToken(user.ID)
+	if err != nil {
+		utils.ResponseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	utils.ResponseOk(w, response{
-		Refresh: tokens["refresh_token"],
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	})
 }
 

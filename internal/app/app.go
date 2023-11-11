@@ -24,9 +24,9 @@ func Run(cfg *config.Config) {
 	cache := cache.New()
 
 	service := service.New(repo, cache)
-	token := token.New(cfg.Secret)
+	token := token.New(cfg.Secret, cfg.AccessTokenExpMinute, cfg.RefreshTokenExpDays)
 	middleware := middleware.New(cfg.Secret, token)
-	handler := rest.New(service, cache, middleware)
+	handler := rest.New(service, cache, middleware, token)
 
 	go handler.ListenAndServe()
 	log.Println("Running...")
