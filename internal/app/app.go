@@ -1,8 +1,10 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/moaton/web-api/config"
 	"github.com/moaton/web-api/internal/middleware"
@@ -14,13 +16,16 @@ import (
 	"github.com/moaton/web-api/pkg/client/postgres"
 )
 
-func Run(cfg *config.Config) {
+func Run(ctx context.Context, wg *sync.WaitGroup, cfg *config.Config) {
+	defer wg.Done()
+
 	url := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", cfg.PostgresUser, cfg.PostgresPassword, cfg.PostgresHost, cfg.PostgresDB)
 	client, err := postgres.NewClient(url)
 	if err != nil {
 		log.Fatalf("postgres.NewClient err %v", err)
 	}
 	repo := db.NewRepository(client)
+	defer repo.Close()
 	cache := cache.New()
 
 	service := service.New(repo, cache)
@@ -28,6 +33,6 @@ func Run(cfg *config.Config) {
 	middleware := middleware.New(cfg.Secret, token)
 	handler := rest.New(service, cache, middleware, token)
 
-	go handler.ListenAndServe()
 	log.Println("Running...")
+	handler.ListenAndServe(ctx)
 }

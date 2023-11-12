@@ -3,6 +3,7 @@ package revenue
 import (
 	"context"
 	"database/sql"
+	"sync"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -16,6 +17,8 @@ type RevenueStorage interface {
 	InsertRevenue(ctx context.Context, revenue models.Revenue) (int64, error)
 	UpdateRevenue(ctx context.Context, revenue models.Revenue) error
 	DeleteRevenue(ctx context.Context, id int64) error
+
+	Close(wg *sync.WaitGroup)
 }
 type storage struct {
 	db *sql.DB
@@ -25,6 +28,11 @@ func NewRevenueStorage(db *sql.DB) RevenueStorage {
 	return &storage{
 		db: db,
 	}
+}
+
+func (s *storage) Close(wg *sync.WaitGroup) {
+	s.db.Close()
+	wg.Done()
 }
 
 func (s *storage) GetRevenues(ctx context.Context, limit, offset int64) ([]models.Revenue, int64, error) {

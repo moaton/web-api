@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"database/sql"
+	"sync"
 
 	_ "github.com/lib/pq"
 	"github.com/moaton/web-api/internal/models"
@@ -14,6 +15,8 @@ type UserStorage interface {
 	InsertUser(ctx context.Context, user models.User) (int64, error)
 	UpdateUser(ctx context.Context, user models.User) error
 	DeleteUser(ctx context.Context, email string) error
+
+	Close(wg *sync.WaitGroup)
 }
 
 type storage struct {
@@ -24,6 +27,11 @@ func NewUserStorage(db *sql.DB) UserStorage {
 	return &storage{
 		db: db,
 	}
+}
+
+func (s *storage) Close(wg *sync.WaitGroup) {
+	s.db.Close()
+	wg.Done()
 }
 
 func (s *storage) GetUserById(ctx context.Context, id int64) (models.User, error) {

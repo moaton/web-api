@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -32,7 +33,7 @@ func New(service *service.Service, cache *cache.Cache, middleware middleware.Mid
 	}
 }
 
-func (h *handler) ListenAndServe() {
+func (h *handler) ListenAndServe(ctx context.Context) {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/refresh", h.userHandler.Refresh).Methods("POST")
@@ -49,8 +50,14 @@ func (h *handler) ListenAndServe() {
 	router.HandleFunc("/revenue/{id}", h.revenueHandler.DeleteRevenue).Methods("DELETE")
 
 	router.Use(h.middleware.AuthMiddleware)
+	server := &http.Server{Addr: ":3030", Handler: router}
 
-	if err := http.ListenAndServe(":3030", router); err != nil {
-		log.Println("ListenAndServe err ", err)
-	}
+	go func() {
+		if err := http.ListenAndServe(":3030", router); err != nil {
+			log.Println("ListenAndServe err ", err)
+		}
+	}()
+
+	<-ctx.Done()
+	server.Shutdown(ctx)
 }
