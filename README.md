@@ -17,6 +17,7 @@
 │       └───rest
 │           ├───revenue
 │           └───user
+├───mocks
 └───pkg
     ├───cache
     ├───client
