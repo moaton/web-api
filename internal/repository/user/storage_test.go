@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	"sync"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -137,4 +138,21 @@ func TestDeleteUser(t *testing.T) {
 
 	err = storage.DeleteUser(context.Background(), "test")
 	require.NoError(t, err)
+}
+
+func TestClose(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	storage := user.NewUserStorage(db)
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	storage.Close(&wg)
+
+	rows := sqlmock.NewRows([]string{"id", "email", "name", "password"}).AddRow(5, "test", "test", "123")
+	mock.ExpectQuery("^SELECT id, email, name, password FROM users*").WithArgs(5).WillReturnRows(rows)
+	_, err = storage.GetUserById(context.Background(), 5)
+	require.Error(t, err)
 }

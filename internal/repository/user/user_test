@@ -1,0 +1,8 @@
+mode: set
+github.com/moaton/web-api/internal/repository/user/storage.go:26.45,30.2 1 1
+github.com/moaton/web-api/internal/repository/user/storage.go:32.45,35.2 2 1
+github.com/moaton/web-api/internal/repository/user/storage.go:37.83,41.2 3 1
+github.com/moaton/web-api/internal/repository/user/storage.go:43.90,47.2 3 1
+github.com/moaton/web-api/internal/repository/user/storage.go:49.84,53.2 3 1
+github.com/moaton/web-api/internal/repository/user/storage.go:55.75,58.2 2 1
+github.com/moaton/web-api/internal/repository/user/storage.go:60.71,63.2 2 1

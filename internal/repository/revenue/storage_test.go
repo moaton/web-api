@@ -3,6 +3,7 @@ package revenue_test
 import (
 	"context"
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
@@ -203,5 +204,25 @@ func TestDeleteRevenue(t *testing.T) {
 	var updateError error = errors.New("sql: problem")
 	mock.ExpectExec("DELETE FROM revenues*").WithArgs(id).WillReturnError(updateError)
 	err = storage.DeleteRevenue(context.Background(), id)
+	require.Error(t, err)
+}
+
+func TestClose(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	storage := revenue.NewRevenueStorage(db)
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	storage.Close(&wg)
+
+	var limit int64 = 10
+	var offset int64 = 0
+
+	var countError error = errors.New("sql: no result")
+	mock.ExpectQuery("^SELECT (.+) FROM revenues*").WithArgs(limit, offset).WillReturnError(countError)
+	_, _, err = storage.GetRevenues(context.Background(), limit, offset)
 	require.Error(t, err)
 }

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -35,6 +36,7 @@ func (m *middleware) AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		ok, err := m.token.IsAuthorized(t[1])
+		fmt.Println("err ", err)
 		if err != nil {
 			utils.ResponseError(w, http.StatusUnauthorized, err.Error())
 			return

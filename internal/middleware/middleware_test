@@ -1,0 +1,10 @@
+mode: set
+github.com/moaton/web-api/internal/middleware/middleware.go:22.55,27.2 1 1
+github.com/moaton/web-api/internal/middleware/middleware.go:29.69,30.71 1 1
+github.com/moaton/web-api/internal/middleware/middleware.go:30.71,33.18 3 1
+github.com/moaton/web-api/internal/middleware/middleware.go:33.18,36.4 2 1
+github.com/moaton/web-api/internal/middleware/middleware.go:38.3,40.17 3 1
+github.com/moaton/web-api/internal/middleware/middleware.go:40.17,43.4 2 1
+github.com/moaton/web-api/internal/middleware/middleware.go:44.3,44.10 1 1
+github.com/moaton/web-api/internal/middleware/middleware.go:44.10,47.4 2 1
+github.com/moaton/web-api/internal/middleware/middleware.go:49.3,49.23 1 1
